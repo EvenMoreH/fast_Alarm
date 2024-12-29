@@ -165,6 +165,7 @@ def homepage():
 
                         // Create a new audio object
                         this.audio = new Audio(this.audioSrc);
+                        this.audio.preload = "auto";
 
                         // Start a countdown
                         var remainingTime = delay;
