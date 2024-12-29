@@ -3,10 +3,10 @@ from fasthtml.common import (Form, Fieldset, Label, Input, Button, Html, Head, B
 from starlette.responses import FileResponse
 
 # for docker
-# app, rt = fast_app(static_path="static") # type: ignore
+app, rt = fast_app(static_path="static") # type: ignore
 
 # for local
-app, rt = fast_app(static_path="app/static", debug=True) # type: ignore
+# app, rt = fast_app(static_path="app/static", debug=True) # type: ignore
 
 
 @rt("/")
@@ -30,10 +30,17 @@ def homepage():
             Div(
                 Div(
                     Div(
-                        H1("Timer #1"),
-                        Form(
-                            Input(type="number", name="time", id="delay-time-1", placeholder="Time (minutes)",
-                                style="width: clamp(150px, 20vw, 350px);")
+                        H1("Timer #1", style="margin-left: 1vw"),
+                        Div(
+                            Div(
+                                Input(type="text", name="name", id="timer-name-1", placeholder="Timer Name",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            Div(
+                                Input(type="number", name="time", id="delay-time-1", placeholder="Time (minutes)",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            cls="inline",
                         ),
                     ),
                     Div(
@@ -46,10 +53,17 @@ def homepage():
                 Div(cls="separator"),
                 Div(
                     Div(
-                        H1("Timer #2"),
-                        Form(
-                            Input(type="number", name="time", id="delay-time-2", placeholder="Time (minutes)",
-                                style="width: clamp(150px, 20vw, 350px);")
+                        H1("Timer #2", style="margin-left: 1vw"),
+                        Div(
+                            Div(
+                                Input(type="text", name="name", id="timer-name-2", placeholder="Timer Name",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            Div(
+                                Input(type="number", name="time", id="delay-time-2", placeholder="Time (minutes)",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            cls="inline",
                         ),
                     ),
                     Div(
@@ -62,10 +76,17 @@ def homepage():
                 Div(cls="separator"),
                 Div(
                     Div(
-                        H1("Timer #3"),
-                        Form(
-                            Input(type="number", name="time", id="delay-time-3", placeholder="Time (minutes)",
-                                style="width: clamp(150px, 20vw, 350px);")
+                        H1("Timer #3", style="margin-left: 1vw"),
+                        Div(
+                            Div(
+                                Input(type="text", name="name", id="timer-name-3", placeholder="Timer Name",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            Div(
+                                Input(type="number", name="time", id="delay-time-3", placeholder="Time (minutes)",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            cls="inline",
                         ),
                     ),
                     Div(
@@ -78,10 +99,17 @@ def homepage():
                 Div(cls="separator"),
                 Div(
                     Div(
-                        H1("Timer #4"),
-                        Form(
-                            Input(type="number", name="time", id="delay-time-4", placeholder="Time (minutes)",
-                                style="width: clamp(150px, 20vw, 350px);"),
+                        H1("Timer #4", style="margin-left: 1vw"),
+                        Div(
+                            Div(
+                                Input(type="text", name="name", id="timer-name-4", placeholder="Timer Name",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            Div(
+                                Input(type="number", name="time", id="delay-time-4", placeholder="Time (minutes)",
+                                    style="width: clamp(150px, 20vw, 350px);"),
+                            ),
+                            cls="inline",
                         ),
                     ),
                     Div(
@@ -91,21 +119,23 @@ def homepage():
                     ),
                     Div(id="countdown-box-4", cls="buttonGrid", style="margin-top: 1vw"),
                 ),
-                Div(cls="separator"),
+                Div(cls="bob"),
                 cls="row",
             ),
             Div(
-                Button("Reset All", onclick="timers.cancelAll()", style="margin-top: 4rem"),
-                cls="buttonGrid",
+                Button("Start All", onclick="timers.startAll()", style="margin-top: 3rem"),
+                Button("Reset All", onclick="timers.cancelAll()", style="margin-top: 3rem"),
+                cls="globalButtonGrid",
             ),
 
             # GPT enhanced script to manage timers:
             Script(
                 """
-                function Timer(timerId, inputId, boxId, audioSrc) {
+                function Timer(timerId, inputId, nameId, boxId, audioSrc) {
                     this.timerId = timerId;
-                    this.inputId = inputId;
-                    this.boxId = boxId;
+                    this.inputId = inputId; // Time input field ID
+                    this.nameId = nameId; // Name input field ID
+                    this.boxId = boxId; // Countdown display box ID
                     this.audioSrc = audioSrc;
                     this.countdownInterval = null;
                     this.isCancelled = false;
@@ -114,6 +144,8 @@ def homepage():
                     this.playAudio = function () {
                         var delayInput = document.getElementById(this.inputId);
                         var delay = parseInt(delayInput.value * 60) || 0; // Get delay in minutes
+                        if (delay <= 0) return; // Skip if no valid delay is provided
+
                         var countdownBox = document.getElementById(this.boxId);
 
                         // Reset cancel state
@@ -129,7 +161,7 @@ def homepage():
                         this.countdownInterval = setInterval(() => {
                             if (this.isCancelled) {
                                 clearInterval(this.countdownInterval); // Stop countdown if cancelled
-                                countdownBox.textContent = "Cancelled!";
+                                countdownBox.textContent = "Resetting...";
                                 this.stopAudio(); // Stop audio playback if playing
                                 return;
                             }
@@ -152,16 +184,18 @@ def homepage():
 
                         var countdownBox = document.getElementById(this.boxId);
                         var delayInput = document.getElementById(this.inputId);
+                        var nameInput = document.getElementById(this.nameId);
 
-                        countdownBox.textContent = "Cancelled!"; // Update the countdown box
+                        countdownBox.textContent = "Resetting..."; // Update the countdown box
 
-                        // Clear the input field
+                        // Clear the input fields
                         delayInput.value = "";
+                        nameInput.value = "";
 
-                        // Set a timeout to clear the text after 5 seconds
+                        // Set a timeout to clear the text after 3 seconds
                         setTimeout(() => {
                             countdownBox.textContent = ""; // Clear the text
-                        }, 5000); // 5000 milliseconds = 5 seconds
+                        }, 3000); // 3000 milliseconds = 3 seconds
                     };
 
                     this.stopAudio = function () {
@@ -172,13 +206,15 @@ def homepage():
                     };
 
                     this.formatTime = function (timeInSeconds) {
-                        var hours = Math.floor(timeInSeconds / 3600);
-                        var minutes = Math.floor((timeInSeconds % 3600) / 60);
-                        var seconds = timeInSeconds % 60;
+                        var hours = Math.floor(timeInSeconds / 3600); // Calculate hours
+                        var minutes = Math.floor((timeInSeconds % 3600) / 60); // Calculate remaining minutes
+                        var seconds = timeInSeconds % 60; // Get remaining seconds
 
                         if (hours > 0) {
+                            // If time is greater than 1 hour, include hours in the format
                             return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
                         } else {
+                            // Otherwise, show only minutes:seconds
                             return `${minutes}:${seconds.toString().padStart(2, "0")}`;
                         }
                     };
@@ -198,16 +234,27 @@ def homepage():
 
                             // Clear all input fields
                             var delayInput = document.getElementById(timer.inputId);
+                            var nameInput = document.getElementById(timer.nameId);
                             delayInput.value = "";
+                            nameInput.value = "";
+                        });
+                    },
+
+                    startAll: function () {
+                        this.timerInstances.forEach((timer) => {
+                            var delayInput = document.getElementById(timer.inputId);
+                            if (delayInput.value.trim() !== "") {
+                                timer.playAudio(); // Start the timer if input is not empty
+                            }
                         });
                     },
                 };
 
                 // Initialize timers
-                var timer1 = new Timer("timer1", "delay-time-1", "countdown-box-1", "/static/sound/alarm.mp3");
-                var timer2 = new Timer("timer2", "delay-time-2", "countdown-box-2", "/static/sound/alarm.mp3");
-                var timer3 = new Timer("timer3", "delay-time-3", "countdown-box-3", "/static/sound/alarm.mp3");
-                var timer4 = new Timer("timer4", "delay-time-4", "countdown-box-4", "/static/sound/alarm.mp3");
+                var timer1 = new Timer("timer1", "delay-time-1", "timer-name-1", "countdown-box-1", "/static/sound/alarm.mp3");
+                var timer2 = new Timer("timer2", "delay-time-2", "timer-name-2", "countdown-box-2", "/static/sound/alarm.mp3");
+                var timer3 = new Timer("timer3", "delay-time-3", "timer-name-3", "countdown-box-3", "/static/sound/alarm.mp3");
+                var timer4 = new Timer("timer4", "delay-time-4", "timer-name-4", "countdown-box-4", "/static/sound/alarm.mp3");
 
                 // Register timers
                 timers.addTimer(timer1);
@@ -225,4 +272,6 @@ def static_files(path: str):
     return FileResponse(f"app/static/{path}", media_type="audio/mpeg")
 
 
-serve() # type: ignore
+if __name__ == '__main__':
+    # Important: Use host='0.0.0.0' to make the server accessible outside the container
+    serve(host='0.0.0.0', port=5010) # type: ignore
