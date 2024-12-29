@@ -1,0 +1,115 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(1rem, 1.2vw, 1.5rem);
+    background-color: rgb(30, 30, 30);
+    color: whitesmoke;
+    accent-color: #292929;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 80%;
+    margin: 0 auto;
+    min-height: 95vh;
+}
+
+h1 {
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+.title {
+    margin-bottom: 4vw;
+    font-size: calc(clamp(1rem, 2.5vw, 3rem) * 1.2);
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.buttonGrid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.separator {
+    width: 2px; /* Default is horizontal */
+    height: clamp(10vw, 20vw, 40vw); /* Thickness of the separator */
+    background-color: rgba(245, 245, 245, 0.5);
+    margin: auto 0; /* Add some space around */
+}
+
+button {
+    padding: 1vw;
+    border-radius: 0.4rem;
+    border-color: whitesmoke;
+    background: #535557;
+    color: whitesmoke;
+    cursor: pointer;
+    font-variant-caps: all-petite-caps;
+    width: clamp(150px, 20vw, 350px);
+  }
+
+
+@media (max-width: 900px) {
+    * {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: clamp(1rem, 2.5vw, 3rem);
+        background-color: rgb(30, 30, 30);
+        color: whitesmoke;
+        accent-color: #292929;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        max-width: 80%;
+        margin: 0 auto;
+        min-height: 95vh;
+    }
+
+    .title {
+        margin-bottom: 4vh;
+        font-size: calc(clamp(1rem, 2.5vw, 3rem) * 1.4);
+    }
+
+    .row {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .buttonGrid {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+    .separator {
+        width: 100%;
+        height: 2px; /* Adjust height as needed */
+        margin: 0 auto; /* Center it vertically */
+        background-color: rgba(245, 245, 245, 0.5);
+    }
+}
