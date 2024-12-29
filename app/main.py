@@ -152,6 +152,13 @@ def homepage():
 
                         var countdownBox = document.getElementById(this.boxId);
 
+                        // Unlock audio playback on first touch for mobile devices
+                        document.body.addEventListener("touchstart", () => {
+                            this.audio.play().catch((error) => {
+                                console.warn("Audio unlock failed:", error);
+                            });
+                        }, { once: true });
+                        
                         // Disable the time input, Start button, and Start All button
                         delayInput.disabled = true;
                         delayInput.style.backgroundColor = "3C3C3C"; // Grey out the input
