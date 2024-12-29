@@ -156,7 +156,9 @@ def homepage():
                         delayInput.disabled = true;
                         delayInput.style.backgroundColor = "3C3C3C"; // Grey out the input
                         startButton.disabled = true;
+                        startButton.style.color = "#969696"; // Change font color when disabled
                         startAllButton.disabled = true;
+                        startAllButton.style.color = "#969696"; // Change font color when disabled
 
                         // Reset cancel state
                         this.isCancelled = false;
@@ -217,7 +219,9 @@ def homepage():
                         delayInput.disabled = false;
                         delayInput.style.backgroundColor = "";
                         startButton.disabled = false; // Re-enable Start button
+                        startButton.style.color = ""; // Re-set font to original
                         timers.checkStartAllButton(); // Re-enable Start All button if no timer is active
+                        startAllButton.style.color = ""; // Re-set font to original
 
                         // Set a timeout to clear the text after 3 seconds
                         setTimeout(() => {
