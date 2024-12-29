@@ -44,7 +44,7 @@ def homepage():
                         ),
                     ),
                     Div(
-                        Button("Start Timer #1", onclick="timer1.playAudio()"),
+                        Button("Start Timer #1", id="start-button-1", onclick="timer1.playAudio()"),
                         Button("Stop Timer #1", onclick="timer1.cancelCountdown()"),
                         cls="buttonGrid",
                     ),
@@ -67,7 +67,7 @@ def homepage():
                         ),
                     ),
                     Div(
-                        Button("Start Timer #2", onclick="timer2.playAudio()"),
+                        Button("Start Timer #2", id="start-button-2", onclick="timer2.playAudio()"),
                         Button("Stop Timer #2", onclick="timer2.cancelCountdown()"),
                         cls="buttonGrid",
                     ),
@@ -90,7 +90,7 @@ def homepage():
                         ),
                     ),
                     Div(
-                        Button("Start Timer #3", onclick="timer3.playAudio()"),
+                        Button("Start Timer #3", id="start-button-3", onclick="timer3.playAudio()"),
                         Button("Stop Timer #3", onclick="timer3.cancelCountdown()"),
                         cls="buttonGrid",
                     ),
@@ -113,7 +113,7 @@ def homepage():
                         ),
                     ),
                     Div(
-                        Button("Start Timer #4", onclick="timer4.playAudio()"),
+                        Button("Start Timer #4", id="start-button-4", onclick="timer4.playAudio()"),
                         Button("Stop Timer #4", onclick="timer4.cancelCountdown()"),
                         cls="buttonGrid",
                     ),
@@ -123,7 +123,7 @@ def homepage():
                 cls="row",
             ),
             Div(
-                Button("Start All", onclick="timers.startAll()", style="margin-top: 3rem"),
+                Button("Start All", id="start-all-button", onclick="timers.startAll()", style="margin-top: 3rem"),
                 Button("Reset All", onclick="timers.cancelAll()", style="margin-top: 3rem"),
                 cls="globalButtonGrid",
             ),
@@ -131,11 +131,12 @@ def homepage():
             # GPT enhanced script to manage timers:
             Script(
                 """
-                function Timer(timerId, inputId, nameId, boxId, audioSrc) {
+                function Timer(timerId, inputId, nameId, boxId, audioSrc, startButtonId) {
                     this.timerId = timerId;
                     this.inputId = inputId; // Time input field ID
                     this.nameId = nameId; // Name input field ID
                     this.boxId = boxId; // Countdown display box ID
+                    this.startButtonId = startButtonId; // Start button ID
                     this.audioSrc = audioSrc;
                     this.countdownInterval = null;
                     this.isCancelled = false;
@@ -143,10 +144,19 @@ def homepage():
 
                     this.playAudio = function () {
                         var delayInput = document.getElementById(this.inputId);
+                        var startButton = document.getElementById(this.startButtonId);
+                        var startAllButton = document.getElementById("start-all-button");
+
                         var delay = parseInt(delayInput.value * 60) || 0; // Get delay in minutes
                         if (delay <= 0) return; // Skip if no valid delay is provided
 
                         var countdownBox = document.getElementById(this.boxId);
+
+                        // Disable the time input, Start button, and Start All button
+                        delayInput.disabled = true;
+                        delayInput.style.backgroundColor = "3C3C3C"; // Grey out the input
+                        startButton.disabled = true;
+                        startAllButton.disabled = true;
 
                         // Reset cancel state
                         this.isCancelled = false;
@@ -163,6 +173,10 @@ def homepage():
                                 clearInterval(this.countdownInterval); // Stop countdown if cancelled
                                 countdownBox.textContent = "Resetting...";
                                 this.stopAudio(); // Stop audio playback if playing
+                                delayInput.disabled = false; // Re-enable input field
+                                delayInput.style.backgroundColor = ""; // Reset style
+                                startButton.disabled = false; // Re-enable Start button
+                                timers.checkStartAllButton(); // Re-enable Start All button if no timer is active
                                 return;
                             }
 
@@ -171,6 +185,10 @@ def homepage():
                                 clearInterval(this.countdownInterval); // Stop countdown
                                 countdownBox.textContent = "Time's Up!";
                                 this.audio.play(); // Play the audio
+                                delayInput.disabled = false; // Re-enable input field
+                                delayInput.style.backgroundColor = ""; // Reset style
+                                startButton.disabled = false; // Re-enable Start button
+                                timers.checkStartAllButton(); // Re-enable Start All button if no timer is active
                             } else {
                                 countdownBox.textContent = this.formatTime(remainingTime); // Update display
                             }
@@ -182,8 +200,11 @@ def homepage():
                         clearInterval(this.countdownInterval); // Stop the interval
                         this.stopAudio(); // Stop audio playback if playing
 
-                        var countdownBox = document.getElementById(this.boxId);
                         var delayInput = document.getElementById(this.inputId);
+                        var startButton = document.getElementById(this.startButtonId);
+                        var startAllButton = document.getElementById("start-all-button");
+
+                        var countdownBox = document.getElementById(this.boxId);
                         var nameInput = document.getElementById(this.nameId);
 
                         countdownBox.textContent = "Resetting..."; // Update the countdown box
@@ -191,6 +212,12 @@ def homepage():
                         // Clear the input fields
                         delayInput.value = "";
                         nameInput.value = "";
+
+                        // Re-enable input field and reset its style
+                        delayInput.disabled = false;
+                        delayInput.style.backgroundColor = "";
+                        startButton.disabled = false; // Re-enable Start button
+                        timers.checkStartAllButton(); // Re-enable Start All button if no timer is active
 
                         // Set a timeout to clear the text after 3 seconds
                         setTimeout(() => {
@@ -237,7 +264,17 @@ def homepage():
                             var nameInput = document.getElementById(timer.nameId);
                             delayInput.value = "";
                             nameInput.value = "";
+
+                            // Re-enable input field and reset its style
+                            delayInput.disabled = false;
+                            delayInput.style.backgroundColor = "";
+                            var startButton = document.getElementById(timer.startButtonId);
+                            startButton.disabled = false; // Re-enable Start button
                         });
+
+                        // Re-enable Start All button
+                        var startAllButton = document.getElementById("start-all-button");
+                        startAllButton.disabled = false;
                     },
 
                     startAll: function () {
@@ -248,13 +285,20 @@ def homepage():
                             }
                         });
                     },
+
+                    checkStartAllButton: function () {
+                        // Disable Start All button if any timer is running
+                        var startAllButton = document.getElementById("start-all-button");
+                        var anyRunning = this.timerInstances.some((timer) => timer.isCancelled === false && timer.countdownInterval !== null);
+                        startAllButton.disabled = anyRunning;
+                    },
                 };
 
                 // Initialize timers
-                var timer1 = new Timer("timer1", "delay-time-1", "timer-name-1", "countdown-box-1", "/static/sound/alarm.mp3");
-                var timer2 = new Timer("timer2", "delay-time-2", "timer-name-2", "countdown-box-2", "/static/sound/alarm.mp3");
-                var timer3 = new Timer("timer3", "delay-time-3", "timer-name-3", "countdown-box-3", "/static/sound/alarm.mp3");
-                var timer4 = new Timer("timer4", "delay-time-4", "timer-name-4", "countdown-box-4", "/static/sound/alarm.mp3");
+                var timer1 = new Timer("timer1", "delay-time-1", "timer-name-1", "countdown-box-1", "/static/sound/alarm.mp3", "start-button-1");
+                var timer2 = new Timer("timer2", "delay-time-2", "timer-name-2", "countdown-box-2", "/static/sound/alarm.mp3", "start-button-2");
+                var timer3 = new Timer("timer3", "delay-time-3", "timer-name-3", "countdown-box-3", "/static/sound/alarm.mp3", "start-button-3");
+                var timer4 = new Timer("timer4", "delay-time-4", "timer-name-4", "countdown-box-4", "/static/sound/alarm.mp3", "start-button-4");
 
                 // Register timers
                 timers.addTimer(timer1);
