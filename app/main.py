@@ -1,5 +1,5 @@
 from fasthtml.common import * # type: ignore
-from fasthtml.common import (Form, Fieldset, Label, Input, Button, Html, Head, Body, Div, P, Title, Titled, A, Link, Audio ,FileResponse)
+from fasthtml.common import (Input, Button, Html, Head, Body, Div, Title, Link ,FileResponse)
 from starlette.responses import FileResponse
 
 # for docker
@@ -158,7 +158,7 @@ def homepage():
                                 console.warn("Audio unlock failed:", error);
                             });
                         }, { once: true });
-                        
+
                         // Disable the time input, Start button, and Start All button
                         delayInput.disabled = true;
                         delayInput.style.backgroundColor = "3C3C3C"; // Grey out the input
