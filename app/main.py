@@ -325,7 +325,7 @@ def homepage():
 # endpoint strictly for setting media type for the audio file (not used for displaying anything)
 @rt("/static/{path:path}")
 def static_files(path: str):
-    return FileResponse(f"app/static/{path}", media_type="audio/mpeg")
+    return FileResponse(f"static/{path}", media_type="audio/mpeg")
 
 
 if __name__ == '__main__':
